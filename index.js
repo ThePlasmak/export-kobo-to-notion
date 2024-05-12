@@ -44,15 +44,12 @@ async function exportHighlights() {
     try {
       const title = book.Title.split(":")[0].trim(); // Simplify and trim title
 
-      // Normalize case for more consistent matching
-      const normalizedTitle = title.toLowerCase();
-
       // Query Notion to check if the book already exists
       const response = await notion.databases.query({
         database_id: process.env.NOTION_DATABASE_ID,
         filter: {
           property: "Title",
-          text: { equals: normalizedTitle },
+          text: { equals: title.toLowerCase() },
         },
       });
 
@@ -60,16 +57,12 @@ async function exportHighlights() {
       let isNewPage = false;
 
       if (response.results.length === 1) {
-        // Use existing page
         pageId = response.results[0].id;
       } else if (response.results.length === 0) {
-        // Create a new page if it doesn't exist
         const newPage = await notion.pages.create({
           parent: { database_id: process.env.NOTION_DATABASE_ID },
           properties: {
-            Title: {
-              title: [{ text: { content: title } }],
-            },
+            Title: { title: [{ text: { content: title } }] },
             Highlights: { checkbox: false },
           },
         });
@@ -77,7 +70,6 @@ async function exportHighlights() {
         isNewPage = true;
         console.log(`Created a new page for ${title}.`);
       } else {
-        // More than one match found, log and skip
         console.log(
           `${title} matched multiple items. Skipping to avoid duplicates.`
         );
@@ -99,30 +91,31 @@ async function exportHighlights() {
         blocks.push({
           object: "block",
           type: "heading_1",
-          heading_1: { text: [{ type: "text", text: { content: "Review" } }] },
+          heading_1: {
+            text: [{ type: "text", text: { content: "Review" } }],
+            is_toggleable: true,
+          },
         });
       }
 
-      // Always add the "Highlights" block
+      // Create the "Highlights" block and prepare to add highlight quotes as children
+      let highlightBlocks = highlightsList.map((highlight) => ({
+        object: "block",
+        type: "quote",
+        quote: {
+          rich_text: [{ type: "text", text: { content: highlight.Text } }],
+        },
+      }));
+
+      // Add the "Highlights" block with nested highlight quotes
       blocks.push({
         object: "block",
         type: "heading_1",
         heading_1: {
           text: [{ type: "text", text: { content: "Highlights" } }],
+          children: highlightBlocks,
+          is_toggleable: true,
         },
-      });
-
-      // Add the highlight quotes
-      highlightsList.forEach((highlight) => {
-        if (highlight.Text) {
-          blocks.push({
-            object: "block",
-            type: "quote",
-            quote: {
-              text: [{ type: "text", text: { content: highlight.Text } }],
-            },
-          });
-        }
       });
 
       // Append blocks to the Notion page
