@@ -5,28 +5,55 @@ require("dotenv").config();
 
 // Import necessary modules
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
+const { execSync } = require("child_process");
 const { Client } = require("@notionhq/client");
 
 // Initialize Notion client with the token from environment variables
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
-// Define the path for the original and new database file
-const originalPath = "E:\\.kobo\\KoboReader.sqlite";
+// Function to find the Kobo eReader drive
+async function findKoboDrive() {
+  try {
+    // This command lists all drives with their volume names
+    const stdout = execSync("wmic logicaldisk get name, volumename").toString();
+    const lines = stdout.trim().split(os.EOL);
+    for (const line of lines) {
+      if (line.includes("KOBOeReader")) {
+        const match = line.match(/(\w:)/); // This regex finds drive letters
+        if (match) {
+          return `${match[1]}\\.kobo\\KoboReader.sqlite`;
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Failed to find KOBOeReader drive:", error);
+  }
+  return null;
+}
+
+// Define the path for the new database file
 const dbPath = path.join("highlights.sqlite");
 
 // Function to ensure directory exists and copy the SQLite file
 async function setupDatabase() {
+  const koboPath = await findKoboDrive();
+  if (!koboPath) {
+    console.error("Kobo eReader not found.");
+    return false;
+  }
+
   try {
     // Ensure the directory exists
     await fs.promises.mkdir(path.dirname(dbPath), { recursive: true });
 
     // Copy the SQLite file to the new location
-    await fs.promises.copyFile(originalPath, dbPath);
+    await fs.promises.copyFile(koboPath, dbPath);
     console.log(`Database file copied and renamed to ${dbPath}\n`);
     return true; // Return true to indicate success
   } catch (error) {
-    console.error("Failed to setup database file:\n", error);
+    console.error("Failed to setup database file:", error);
     return false; // Return false to indicate failure
   }
 }
