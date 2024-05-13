@@ -1,3 +1,5 @@
+// Run the script by plugging in the Kobo to the computer, opening the "export-kobo-to-notion" folder in the terminal, then running "npm start"
+
 // Load environment variables
 require("dotenv").config();
 
@@ -42,14 +44,14 @@ async function exportHighlights() {
 
   for (const book of bookList) {
     try {
-      const title = book.Title.split(":")[0].trim(); // Simplify and trim title
+      const title = book.Title; // Use the full title as is
 
       // Query Notion to check if the book already exists
       const response = await notion.databases.query({
         database_id: process.env.NOTION_DATABASE_ID,
         filter: {
           property: "Title",
-          text: { equals: title.toLowerCase() },
+          text: { contains: title },
         },
       });
 

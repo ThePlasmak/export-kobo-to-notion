@@ -30,8 +30,8 @@ You'll also need to configure a Notion "integration" that has access to the data
    NOTION_DATABASE_ID=776yv4nanf6qx0bdttznd9upfljupb11
    ```
 
-1. Connect your Kobo to your computer and open it in File Explorer. Navigate into the `.kobo` directory and copy the file called `KoboReader.sqlite`, and then paste it into the `export-kobo-to-notion` folder and rename it `highlights.sqlite`.
+2. Connect your Kobo to your computer.
 
-1. Go to your Notion library database and make sure that the database contains a "Title" property with the name of the book, and a "Highlights" checkbox property which defaults to unchecked. (The script will match books based on the title, and then see if highlights have already been uploaded: if not, it will upload them, and then set the "Highlights" box to checked).
+3. Go to your Notion library database and make sure that the database contains a "Title" property, and a "Highlights" checkbox property which defaults to unchecked. (The script will match books based on the title, and then see if highlights have already been uploaded: if not, it will upload them, and then set the "Highlights" box to checked. If the title does not already exist, it will create a new page with the highlights.).
 
-1. Run the script with the command `npm start`, and then check your Notion database to confirm that it worked.
+4. Run the script with the command `npm start`, and then check your Notion database to confirm that it worked.
