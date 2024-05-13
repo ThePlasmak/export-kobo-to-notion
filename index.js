@@ -1,4 +1,4 @@
-// Run the script by plugging in the Kobo to the computer, opening the "export-kobo-to-notion" folder in the terminal, then running "npm start"
+// Run the script by plugging in the Kobo to the computer, opening the "export-kobo-to-notion" folder in the terminal, then entering "npm start"
 
 // Load environment variables
 require("dotenv").config();
