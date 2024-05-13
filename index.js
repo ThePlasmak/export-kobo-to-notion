@@ -55,9 +55,16 @@ async function exportHighlights() {
 
       let pageId;
       let isNewPage = false;
+      let skipHighlights = false;
 
       if (response.results.length === 1) {
         pageId = response.results[0].id;
+        if (response.results[0].properties.Highlights.checkbox === true) {
+          console.log(
+            `Highlights checkbox for ${title} has been checked. Skipping new highlights.`
+          );
+          skipHighlights = true;
+        }
       } else if (response.results.length === 0) {
         const newPage = await notion.pages.create({
           parent: { database_id: process.env.NOTION_DATABASE_ID },
@@ -73,6 +80,10 @@ async function exportHighlights() {
         console.log(
           `${title} matched multiple items. Skipping to avoid duplicates.`
         );
+        continue;
+      }
+
+      if (skipHighlights) {
         continue;
       }
 
