@@ -71,7 +71,7 @@ async function exportHighlights() {
 
   for (const book of bookList) {
     try {
-      const title = book.Title; // Use the full title as is
+      const title = book.Title.trim();
 
       // Query Notion to check if the book already exists
       const response = await notion.databases.query({
@@ -143,7 +143,9 @@ async function exportHighlights() {
         object: "block",
         type: "quote",
         quote: {
-          rich_text: [{ type: "text", text: { content: highlight.Text } }],
+          rich_text: [
+            { type: "text", text: { content: highlight.Text.trim() } },
+          ],
         },
       }));
 
