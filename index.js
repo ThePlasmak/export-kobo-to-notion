@@ -90,11 +90,11 @@ async function exportHighlights() {
         pageId = response.results[0].id;
         if (response.results[0].properties.Highlights.checkbox === true) {
           console.log(
-            `Highlights checkbox for ${title} has been checked. Skipping new highlights.`
+            `${title}: highlights checkbox has been checked. Skipping new highlights.`
           );
           skipHighlights = true;
         }
-      } else if (response.results.length === 0) {
+      } else {
         const newPage = await notion.pages.create({
           parent: { database_id: process.env.NOTION_DATABASE_ID },
           properties: {
@@ -104,12 +104,12 @@ async function exportHighlights() {
         });
         pageId = newPage.id;
         isNewPage = true;
-        console.log(`Created a new page for ${title}.`);
-      } else {
-        console.log(
-          `${title} matched multiple items. Skipping to avoid duplicates.`
-        );
-        continue;
+
+        if (response.results.length === 0) {
+          console.log(`${title}: warning: multiple matches found.`);
+        }
+
+        console.log(`${title}: new page created.`);
       }
 
       if (skipHighlights) {
@@ -172,9 +172,9 @@ async function exportHighlights() {
         properties: { Highlights: { checkbox: true } },
       });
 
-      console.log(`Uploaded highlights for ${title}.`);
+      console.log(`${title}: uploaded highlights.`);
     } catch (error) {
-      console.log(`Error with ${book.Title}: `, error);
+      console.log(`${book.Title}: error: `, error);
     }
   }
 }
