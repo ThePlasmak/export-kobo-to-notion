@@ -95,6 +95,10 @@ async function exportHighlights() {
           skipHighlights = true;
         }
       } else {
+        if (response.results.length === 0) {
+          console.log(`${title}: warning: multiple matches found.`);
+        }
+
         const newPage = await notion.pages.create({
           parent: { database_id: process.env.NOTION_DATABASE_ID },
           properties: {
@@ -104,10 +108,6 @@ async function exportHighlights() {
         });
         pageId = newPage.id;
         isNewPage = true;
-
-        if (response.results.length === 0) {
-          console.log(`${title}: warning: multiple matches found.`);
-        }
 
         console.log(`${title}: new page created.`);
       }
