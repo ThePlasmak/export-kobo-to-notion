@@ -71,7 +71,7 @@ async function exportHighlights() {
 
   for (const book of bookList) {
     try {
-      const title = book.Title.trim();
+      const title = book.Title;
 
       // Query Notion to check if the book already exists
       const response = await notion.databases.query({
@@ -94,11 +94,7 @@ async function exportHighlights() {
           );
           skipHighlights = true;
         }
-      } else {
-        if (response.results.length === 0) {
-          console.log(`${title}: warning: multiple matches found.`);
-        }
-
+      } else if (response.results.length === 0) {
         const newPage = await notion.pages.create({
           parent: { database_id: process.env.NOTION_DATABASE_ID },
           properties: {
@@ -108,8 +104,12 @@ async function exportHighlights() {
         });
         pageId = newPage.id;
         isNewPage = true;
-
         console.log(`${title}: new page created.`);
+      } else {
+        console.log(
+          `${title} matched multiple items. Skipping to avoid duplicates.`
+        );
+        continue;
       }
 
       if (skipHighlights) {
