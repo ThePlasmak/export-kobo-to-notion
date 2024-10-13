@@ -32,5 +32,5 @@ You'll also need to configure a Notion "integration" that has access to the data
 
 5. Go to your Notion library database and make sure that the database contains a title property named "Title", and a checkbox property named "Highlights" which defaults to unchecked. (The script will match books based on the title, and then see if the "Highlights" checkbox is checked: if not, it will upload them, and then set the "Highlights" box to checked. If the title of the book does not already exist, it will create a new page with the highlights.).
 
-6. Run the script with the command `npm start`, and then check your Notion database to confirm that it worked.
-   1. Or you can double-click the `run.bat` file.
+6. Double-click the `run.bat` file, and then check your Notion database to confirm that it worked.
+   1. Or run the script with the command `npm start`.
